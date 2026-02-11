@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  STAFF
+  CUSTOMER
+}
+
+enum WorkOrderStatus {
+  DRAFT
+  SUBMITTED
+  OWNER_VERIFIED
+  EXTERNAL_DAMAGE_REPORTED
+  DEVICE_INFO_RECORDED
+  DIAGNOSED
+  REPAIRING
+  STORED_IN
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  REOPENED
+  CLOSED_ABNORMAL
+}
+
+enum InspectionResult {
+  NORMAL
+  ABNORMAL
+}
+
+enum RepairResult {
+  FIXED
+  UNFIXED
+  NA
+}
+
+enum InventoryTxnType {
+  IN
+  OUT
+}
+
+enum AttachmentType {
+  PACKAGE_PHOTO
+  DEVICE_PHOTO
+  LABEL_PHOTO
+  DELIVERY_PROOF
+  OTHER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  customerWorkOrders  WorkOrder[]      @relation("CustomerWorkOrders")
+  assignedWorkOrders  WorkOrder[]      @relation("AssignedWorkOrders")
+  createdInspections  Inspection[]
+  createdRepairs      Repair[]
+  createdInventoryTxn InventoryTxn[]
+  createdAttachments  Attachment[]
+  workOrderEvents     WorkOrderEvent[]
+
+  @@map("users")
+}
+
+model WorkOrder {
+  id                 String          @id @default(cuid())
+  orderNo            String?
+  status             WorkOrderStatus @default(SUBMITTED)
+  customerUserId     String
+  customerName       String?
+  customerPhone      String?
+  customerAddress    String?
+  inboundTrackingNo  String?
+  outboundTrackingNo String?
+  assignedToUserId   String?
+  deviceId           String?         @unique
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  // Relations
+  customer     User                @relation("CustomerWorkOrders", fields: [customerUserId], references: [id])
+  assignedTo   User?               @relation("AssignedWorkOrders", fields: [assignedToUserId], references: [id])
+  device       Device?             @relation(fields: [deviceId], references: [id])
+  inspections  Inspection[]
+  repairs      Repair[]
+  inventoryTxn InventoryTxn[]
+  attachments  Attachment[]
+  events       WorkOrderEvent[]
+  confirmToken PublicConfirmToken?
+
+  @@map("work_orders")
+}
+
+model Device {
+  id             String   @id @default(cuid())
+  brand          String
+  model          String
+  imei           String?
+  serialNo       String?
+  conditionNotes String?
+  labelCode      String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  workOrder WorkOrder?
+
+  @@map("devices")
+}
+
+model Inspection {
+  id              String           @id @default(cuid())
+  workOrderId     String
+  result          InspectionResult
+  checklistJson   Json?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  createdByUserId String
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  createdBy User      @relation(fields: [createdByUserId], references: [id])
+
+  @@map("inspections")
+}
+
+model Repair {
+  id              String       @id @default(cuid())
+  workOrderId     String
+  actionsJson     Json?
+  cost            Decimal?     @db.Decimal(10, 2)
+  result          RepairResult
+  notes           String?
+  createdAt       DateTime     @default(now())
+  createdByUserId String
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  createdBy User      @relation(fields: [createdByUserId], references: [id])
+
+  @@map("repairs")
+}
+
+model InventoryTxn {
+  id              String           @id @default(cuid())
+  workOrderId     String
+  type            InventoryTxnType
+  location        String?
+  occurredAt      DateTime         @default(now())
+  notes           String?
+  createdByUserId String
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  createdBy User      @relation(fields: [createdByUserId], references: [id])
+
+  @@map("inventory_txns")
+}
+
+model Attachment {
+  id              String         @id @default(cuid())
+  workOrderId     String
+  type            AttachmentType
+  filePath        String
+  mimeType        String
+  size            Int
+  createdAt       DateTime       @default(now())
+  createdByUserId String
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  createdBy User      @relation(fields: [createdByUserId], references: [id])
+
+  @@map("attachments")
+}
+
+model WorkOrderEvent {
+  id           String          @id @default(cuid())
+  workOrderId  String
+  fromStatus   WorkOrderStatus
+  toStatus     WorkOrderStatus
+  action       String
+  actorUserId  String?
+  actorRole    Role?
+  metadataJson Json?
+  createdAt    DateTime        @default(now())
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  actor     User?     @relation(fields: [actorUserId], references: [id])
+
+  @@map("work_order_events")
+}
+
+model PublicConfirmToken {
+  id          String    @id @default(cuid())
+  workOrderId String    @unique
+  token       String    @unique
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@map("public_confirm_tokens")
+}

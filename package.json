@@ -1,0 +1,39 @@
+{
+  "name": "repair-workflow",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @repo/api prisma migrate deploy",
+    "db:migrate:dev": "pnpm --filter @repo/api prisma migrate dev",
+    "db:generate": "pnpm --filter @repo/api prisma generate",
+    "db:studio": "pnpm --filter @repo/api prisma studio",
+    "seed": "pnpm --filter @repo/api prisma db seed",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down -v",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.8.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.11.0",
+    "bcrypt": "^5.1.1",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "ts-node": "^10.9.2",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+  }
+}
