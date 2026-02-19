@@ -1,4 +1,4 @@
-import { WorkOrderStatus, Action, Role, InspectionResult, RepairResult, InventoryTxnType, AttachmentType } from '@repo/shared';
+import { WorkOrderStatus, Action, Role, InspectionResult, RepairResult, InventoryTxnType, AttachmentType, RepairType, Urgency, WarrantyStatus } from '@repo/shared';
 
 export interface UserBrief {
   id: string;
@@ -86,6 +86,9 @@ export interface WorkOrderDetail {
   assignedToUserId?: string | null;
   deviceId?: string | null;
   notes?: string | null;
+  repairType?: RepairType | null;
+  urgency?: Urgency | null;
+  warrantyStatus?: WarrantyStatus | null;
   createdAt: string;
   updatedAt: string;
   customer: UserBrief;
@@ -112,6 +115,9 @@ export interface WorkOrderListItem {
   outboundTrackingNo?: string | null;
   assignedToUserId?: string | null;
   notes?: string | null;
+  repairType?: RepairType | null;
+  urgency?: Urgency | null;
+  warrantyStatus?: WarrantyStatus | null;
   createdAt: string;
   updatedAt: string;
   customer: UserBrief;

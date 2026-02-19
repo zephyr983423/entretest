@@ -92,17 +92,37 @@ export const usersApi = {
 
 // Work Orders
 export const workOrdersApi = {
-  list: (params?: { status?: string; q?: string; page?: number; pageSize?: number }) => {
+  list: (params?: {
+    status?: string;
+    repairType?: string;
+    urgency?: string;
+    warrantyStatus?: string;
+    q?: string;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.set('status', params.status);
+    if (params?.repairType) searchParams.set('repairType', params.repairType);
+    if (params?.urgency) searchParams.set('urgency', params.urgency);
+    if (params?.warrantyStatus) searchParams.set('warrantyStatus', params.warrantyStatus);
     if (params?.q) searchParams.set('q', params.q);
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
+    if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
+    if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder);
     const query = searchParams.toString();
     return get<PaginatedResponse<WorkOrderListItem>>(
       `/work-orders${query ? `?${query}` : ''}`,
     );
   },
+  batchShip: (data: { workOrderIds: string[]; outboundTrackingNos: Record<string, string> }) =>
+    post<{ results: Array<{ id: string; success: boolean; error?: string }> }>(
+      '/work-orders/batch/ship',
+      data,
+    ),
   get: (id: string) => get<WorkOrderDetail>(`/work-orders/${id}`),
   create: (data: {
     orderNo?: string;

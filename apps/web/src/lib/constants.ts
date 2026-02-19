@@ -1,4 +1,4 @@
-import { WorkOrderStatus, Action } from '@repo/shared';
+import { WorkOrderStatus, Action, RepairType, Urgency, WarrantyStatus } from '@repo/shared';
 
 export const STATUS_LABELS_ZH: Record<WorkOrderStatus, string> = {
   [WorkOrderStatus.DRAFT]: '草稿',
@@ -50,6 +50,36 @@ export const STATUS_COLORS: Record<WorkOrderStatus, BadgeVariant> = {
   [WorkOrderStatus.COMPLETED]: 'success',
   [WorkOrderStatus.REOPENED]: 'warning',
   [WorkOrderStatus.CLOSED_ABNORMAL]: 'destructive',
+};
+
+export const REPAIR_TYPE_LABELS_ZH: Record<RepairType, string> = {
+  [RepairType.SCREEN]: '屏幕维修',
+  [RepairType.BATTERY]: '电池更换',
+  [RepairType.MOTHERBOARD]: '主板维修',
+  [RepairType.WATER_DAMAGE]: '进水维修',
+  [RepairType.CHARGING_PORT]: '充电口维修',
+  [RepairType.CAMERA]: '摄像头维修',
+  [RepairType.SPEAKER]: '扬声器维修',
+  [RepairType.SOFTWARE]: '软件问题',
+  [RepairType.OTHER]: '其他',
+};
+
+export const URGENCY_LABELS_ZH: Record<Urgency, string> = {
+  [Urgency.NORMAL]: '普通',
+  [Urgency.URGENT]: '加急',
+  [Urgency.CRITICAL]: '特急',
+};
+
+export const WARRANTY_LABELS_ZH: Record<WarrantyStatus, string> = {
+  [WarrantyStatus.IN_WARRANTY]: '在保',
+  [WarrantyStatus.OUT_OF_WARRANTY]: '过保',
+  [WarrantyStatus.EXTENDED]: '延保',
+};
+
+export const URGENCY_COLORS: Record<Urgency, string> = {
+  [Urgency.NORMAL]: 'text-gray-500',
+  [Urgency.URGENT]: 'text-yellow-600 font-medium',
+  [Urgency.CRITICAL]: 'text-red-600 font-bold',
 };
 
 // Main-path statuses for the progress bar (10 steps)

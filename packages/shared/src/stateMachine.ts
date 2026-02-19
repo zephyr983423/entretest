@@ -85,43 +85,43 @@ export interface EditableFields {
 
 export const editableFieldsByStatus: Record<WorkOrderStatus, EditableFields> = {
   [WorkOrderStatus.DRAFT]: {
-    allowed: ['orderNo', 'customerName', 'customerPhone', 'customerAddress', 'notes'],
+    allowed: ['orderNo', 'customerName', 'customerPhone', 'customerAddress', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER, Role.CUSTOMER, Role.STAFF],
   },
   [WorkOrderStatus.SUBMITTED]: {
-    allowed: ['orderNo', 'customerName', 'customerPhone', 'customerAddress', 'notes'],
+    allowed: ['orderNo', 'customerName', 'customerPhone', 'customerAddress', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER, Role.CUSTOMER],
   },
   [WorkOrderStatus.OWNER_VERIFIED]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.EXTERNAL_DAMAGE_REPORTED]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.DEVICE_INFO_RECORDED]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.DIAGNOSED]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.REPAIRING]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.STORED_IN]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.READY_TO_SHIP]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.SHIPPED]: {
-    allowed: ['orderNo'],
+    allowed: ['orderNo', 'urgency'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.DELIVERED]: {
@@ -133,7 +133,7 @@ export const editableFieldsByStatus: Record<WorkOrderStatus, EditableFields> = {
     roles: [],
   },
   [WorkOrderStatus.REOPENED]: {
-    allowed: ['orderNo', 'notes'],
+    allowed: ['orderNo', 'notes', 'repairType', 'urgency', 'warrantyStatus'],
     roles: [Role.OWNER],
   },
   [WorkOrderStatus.CLOSED_ABNORMAL]: {

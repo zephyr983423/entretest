@@ -6,7 +6,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { workOrdersApi } from '@/lib/api-client';
+import {
+  REPAIR_TYPE_LABELS_ZH,
+  URGENCY_LABELS_ZH,
+  WARRANTY_LABELS_ZH,
+  URGENCY_COLORS,
+} from '@/lib/constants';
 import type { WorkOrderDetail } from './types';
 
 interface SectionBasicInfoProps {
@@ -24,6 +37,9 @@ export function SectionBasicInfo({ workOrder, editableFields, onUpdated }: Secti
     customerPhone: workOrder.customerPhone || '',
     customerAddress: workOrder.customerAddress || '',
     notes: workOrder.notes || '',
+    repairType: workOrder.repairType || '',
+    urgency: workOrder.urgency || '',
+    warrantyStatus: workOrder.warrantyStatus || '',
   });
 
   const canEdit = editableFields.length > 0;
@@ -31,10 +47,11 @@ export function SectionBasicInfo({ workOrder, editableFields, onUpdated }: Secti
   const handleSave = async () => {
     setSaving(true);
     try {
-      const data: Record<string, string> = {};
+      const data: Record<string, string | undefined> = {};
       for (const field of editableFields) {
         if (field in form) {
-          data[field] = form[field as keyof typeof form];
+          const val = form[field as keyof typeof form];
+          data[field] = val || undefined;
         }
       }
       const updated = await workOrdersApi.update(workOrder.id, data);
@@ -79,6 +96,44 @@ export function SectionBasicInfo({ workOrder, editableFields, onUpdated }: Secti
     );
   };
 
+  const renderSelectField = (
+    label: string,
+    field: 'repairType' | 'urgency' | 'warrantyStatus',
+    options: Record<string, string>,
+    colorMap?: Record<string, string>,
+  ) => {
+    const isEditable = editing && editableFields.includes(field);
+    const value = form[field];
+    const displayLabel = value ? options[value] : '-';
+
+    if (isEditable) {
+      return (
+        <div className="space-y-1">
+          <Label className="text-sm text-gray-500">{label}</Label>
+          <Select value={value || '_NONE_'} onValueChange={(v) => setForm({ ...form, [field]: v === '_NONE_' ? '' : v })}>
+            <SelectTrigger>
+              <SelectValue placeholder={`选择${label}`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_NONE_">未设置</SelectItem>
+              {Object.entries(options).map(([k, v]) => (
+                <SelectItem key={k} value={k}>{v}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    const colorClass = colorMap && value ? colorMap[value] : '';
+    return (
+      <div className="flex justify-between">
+        <span className="text-gray-500">{label}</span>
+        <span className={colorClass}>{displayLabel}</span>
+      </div>
+    );
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -108,6 +163,9 @@ export function SectionBasicInfo({ workOrder, editableFields, onUpdated }: Secti
         {renderField('客户姓名', 'customerName')}
         {renderField('客户电话', 'customerPhone')}
         {renderField('客户地址', 'customerAddress')}
+        {renderSelectField('维修类型', 'repairType', REPAIR_TYPE_LABELS_ZH)}
+        {renderSelectField('紧急程度', 'urgency', URGENCY_LABELS_ZH, URGENCY_COLORS)}
+        {renderSelectField('保修状态', 'warrantyStatus', WARRANTY_LABELS_ZH)}
         {renderField('备注', 'notes', true)}
         <div className="flex justify-between">
           <span className="text-gray-500">创建时间</span>

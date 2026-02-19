@@ -26,6 +26,7 @@ import {
   CustomerConfirmInput,
   ReportExternalDamageInput,
   WorkOrderQueryInput,
+  BatchShipInput,
   InventoryTxnType,
 } from '@repo/shared';
 import { customAlphabet } from 'nanoid';
@@ -87,7 +88,7 @@ export class WorkOrdersService {
   }
 
   async findAll(user: CurrentUser, query: WorkOrderQueryInput) {
-    const { status, q, page, pageSize } = query;
+    const { status, repairType, urgency, warrantyStatus, q, page, pageSize, sortBy, sortOrder } = query;
 
     const where: any = {};
 
@@ -100,6 +101,15 @@ export class WorkOrdersService {
     if (status) {
       where.status = status;
     }
+    if (repairType) {
+      where.repairType = repairType;
+    }
+    if (urgency) {
+      where.urgency = urgency;
+    }
+    if (warrantyStatus) {
+      where.warrantyStatus = warrantyStatus;
+    }
 
     if (q) {
       where.OR = [
@@ -110,6 +120,10 @@ export class WorkOrdersService {
       ];
     }
 
+    const orderBy: any = sortBy
+      ? { [sortBy]: sortOrder || 'desc' }
+      : { createdAt: 'desc' };
+
     const [items, total] = await Promise.all([
       this.prisma.workOrder.findMany({
         where,
@@ -118,7 +132,7 @@ export class WorkOrdersService {
           assignedTo: { select: { id: true, name: true } },
           device: { select: { id: true, brand: true, model: true, labelCode: true } },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -182,6 +196,9 @@ export class WorkOrdersService {
           customerPhone: input.customerPhone,
           customerAddress: input.customerAddress,
           notes: input.notes,
+          repairType: input.repairType,
+          urgency: input.urgency,
+          warrantyStatus: input.warrantyStatus,
         },
       });
 
@@ -524,6 +541,72 @@ export class WorkOrdersService {
     });
 
     return this.findOne(id, user);
+  }
+
+  // Batch Ship
+  async batchShip(user: CurrentUser, input: BatchShipInput) {
+    if (user.role !== Role.OWNER) {
+      throw new ForbiddenException('Only OWNER can batch ship');
+    }
+
+    const results: Array<{ id: string; success: boolean; error?: string }> = [];
+
+    for (const woId of input.workOrderIds) {
+      try {
+        const trackingNo = input.outboundTrackingNos[woId];
+        if (!trackingNo) {
+          results.push({ id: woId, success: false, error: 'Missing tracking number' });
+          continue;
+        }
+
+        const workOrder = await this.prisma.workOrder.findUnique({ where: { id: woId } });
+        if (!workOrder) {
+          results.push({ id: woId, success: false, error: 'Work order not found' });
+          continue;
+        }
+
+        if (workOrder.status !== WorkOrderStatus.READY_TO_SHIP) {
+          results.push({ id: woId, success: false, error: `Status is ${workOrder.status}, not READY_TO_SHIP` });
+          continue;
+        }
+
+        await this.prisma.$transaction(async (tx) => {
+          await tx.inventoryTxn.create({
+            data: {
+              workOrderId: woId,
+              type: InventoryTxnType.OUT,
+              notes: `Shipped with tracking: ${trackingNo}`,
+              createdByUserId: user.id,
+            },
+          });
+
+          await tx.workOrder.update({
+            where: { id: woId },
+            data: {
+              outboundTrackingNo: trackingNo,
+              status: WorkOrderStatus.SHIPPED,
+            },
+          });
+
+          await tx.workOrderEvent.create({
+            data: {
+              workOrderId: woId,
+              fromStatus: WorkOrderStatus.READY_TO_SHIP,
+              toStatus: WorkOrderStatus.SHIPPED,
+              action: Action.SHIP,
+              actorUserId: user.id,
+              actorRole: user.role,
+            },
+          });
+        });
+
+        results.push({ id: woId, success: true });
+      } catch {
+        results.push({ id: woId, success: false, error: 'Internal error' });
+      }
+    }
+
+    return { results };
   }
 
   // Generic action executor with state machine validation

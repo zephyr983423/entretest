@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Role, WorkOrderStatus, InspectionResult, RepairResult, AttachmentType } from './enums';
+import { Role, WorkOrderStatus, InspectionResult, RepairResult, AttachmentType, RepairType, Urgency, WarrantyStatus } from './enums';
 
 // Auth schemas
 export const loginSchema = z.object({
@@ -25,6 +25,9 @@ export const createWorkOrderSchema = z.object({
   customerPhone: z.string().optional(),
   customerAddress: z.string().optional(),
   notes: z.string().optional(),
+  repairType: z.nativeEnum(RepairType).optional(),
+  urgency: z.nativeEnum(Urgency).optional(),
+  warrantyStatus: z.nativeEnum(WarrantyStatus).optional(),
 });
 
 export const updateWorkOrderSchema = z.object({
@@ -33,6 +36,9 @@ export const updateWorkOrderSchema = z.object({
   customerPhone: z.string().optional(),
   customerAddress: z.string().optional(),
   notes: z.string().optional(),
+  repairType: z.nativeEnum(RepairType).optional(),
+  urgency: z.nativeEnum(Urgency).optional(),
+  warrantyStatus: z.nativeEnum(WarrantyStatus).optional(),
 });
 
 export const assignWorkOrderSchema = z.object({
@@ -112,9 +118,20 @@ export const attachmentTypeSchema = z.nativeEnum(AttachmentType);
 // Query schemas
 export const workOrderQuerySchema = z.object({
   status: z.nativeEnum(WorkOrderStatus).optional(),
+  repairType: z.nativeEnum(RepairType).optional(),
+  urgency: z.nativeEnum(Urgency).optional(),
+  warrantyStatus: z.nativeEnum(WarrantyStatus).optional(),
   q: z.string().optional(),
   page: z.coerce.number().int().positive().default(1),
   pageSize: z.coerce.number().int().positive().max(100).default(20),
+  sortBy: z.enum(['createdAt', 'updatedAt', 'status', 'urgency', 'customerName']).optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
+});
+
+// Batch ship schema
+export const batchShipSchema = z.object({
+  workOrderIds: z.array(z.string()).min(1),
+  outboundTrackingNos: z.record(z.string(), z.string()),
 });
 
 // Type exports
@@ -136,3 +153,4 @@ export type CustomerConfirmInput = z.infer<typeof customerConfirmSchema>;
 export type RequestTokenInput = z.infer<typeof requestTokenSchema>;
 export type PublicConfirmInput = z.infer<typeof publicConfirmSchema>;
 export type WorkOrderQueryInput = z.infer<typeof workOrderQuerySchema>;
+export type BatchShipInput = z.infer<typeof batchShipSchema>;

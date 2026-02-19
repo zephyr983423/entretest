@@ -61,6 +61,54 @@ export enum AttachmentType {
   OTHER = 'OTHER',
 }
 
+export enum RepairType {
+  SCREEN = 'SCREEN',
+  BATTERY = 'BATTERY',
+  MOTHERBOARD = 'MOTHERBOARD',
+  WATER_DAMAGE = 'WATER_DAMAGE',
+  CHARGING_PORT = 'CHARGING_PORT',
+  CAMERA = 'CAMERA',
+  SPEAKER = 'SPEAKER',
+  SOFTWARE = 'SOFTWARE',
+  OTHER = 'OTHER',
+}
+
+export enum Urgency {
+  NORMAL = 'NORMAL',
+  URGENT = 'URGENT',
+  CRITICAL = 'CRITICAL',
+}
+
+export enum WarrantyStatus {
+  IN_WARRANTY = 'IN_WARRANTY',
+  OUT_OF_WARRANTY = 'OUT_OF_WARRANTY',
+  EXTENDED = 'EXTENDED',
+}
+
+export const REPAIR_TYPE_LABELS: Record<RepairType, string> = {
+  [RepairType.SCREEN]: 'Screen',
+  [RepairType.BATTERY]: 'Battery',
+  [RepairType.MOTHERBOARD]: 'Motherboard',
+  [RepairType.WATER_DAMAGE]: 'Water Damage',
+  [RepairType.CHARGING_PORT]: 'Charging Port',
+  [RepairType.CAMERA]: 'Camera',
+  [RepairType.SPEAKER]: 'Speaker',
+  [RepairType.SOFTWARE]: 'Software',
+  [RepairType.OTHER]: 'Other',
+};
+
+export const URGENCY_LABELS: Record<Urgency, string> = {
+  [Urgency.NORMAL]: 'Normal',
+  [Urgency.URGENT]: 'Urgent',
+  [Urgency.CRITICAL]: 'Critical',
+};
+
+export const WARRANTY_STATUS_LABELS: Record<WarrantyStatus, string> = {
+  [WarrantyStatus.IN_WARRANTY]: 'In Warranty',
+  [WarrantyStatus.OUT_OF_WARRANTY]: 'Out of Warranty',
+  [WarrantyStatus.EXTENDED]: 'Extended',
+};
+
 export const STATUS_LABELS: Record<WorkOrderStatus, string> = {
   [WorkOrderStatus.DRAFT]: 'Draft',
   [WorkOrderStatus.SUBMITTED]: 'Submitted',

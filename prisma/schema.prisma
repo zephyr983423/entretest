@@ -54,6 +54,30 @@ enum AttachmentType {
   OTHER
 }
 
+enum RepairType {
+  SCREEN
+  BATTERY
+  MOTHERBOARD
+  WATER_DAMAGE
+  CHARGING_PORT
+  CAMERA
+  SPEAKER
+  SOFTWARE
+  OTHER
+}
+
+enum Urgency {
+  NORMAL
+  URGENT
+  CRITICAL
+}
+
+enum WarrantyStatus {
+  IN_WARRANTY
+  OUT_OF_WARRANTY
+  EXTENDED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -88,6 +112,9 @@ model WorkOrder {
   assignedToUserId   String?
   deviceId           String?         @unique
   notes              String?
+  repairType         RepairType?
+  urgency            Urgency         @default(NORMAL)
+  warrantyStatus     WarrantyStatus?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 

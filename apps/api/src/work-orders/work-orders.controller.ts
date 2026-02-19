@@ -27,8 +27,10 @@ import {
   customerConfirmSchema,
   reportExternalDamageSchema,
   workOrderQuerySchema,
+  batchShipSchema,
   CreateWorkOrderInput,
   UpdateWorkOrderInput,
+  BatchShipInput,
   AssignWorkOrderInput,
   VerifyActionInput,
   RecordDeviceInput,
@@ -54,6 +56,15 @@ export class WorkOrdersController {
     @Query(new ZodValidationPipe(workOrderQuerySchema)) query: WorkOrderQueryInput,
   ) {
     const result = await this.workOrdersService.findAll(req.user, query);
+    return { data: result, error: null };
+  }
+
+  @Post('batch/ship')
+  async batchShip(
+    @Request() req: any,
+    @Body(new ZodValidationPipe(batchShipSchema)) input: BatchShipInput,
+  ) {
+    const result = await this.workOrdersService.batchShip(req.user, input);
     return { data: result, error: null };
   }
 
