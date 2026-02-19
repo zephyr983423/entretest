@@ -44,8 +44,8 @@ pnpm dev                      # 启动开发服务器
 | 角色 | 邮箱 | 密码 |
 |------|------|------|
 | 店主 (OWNER) | owner@example.com | password123 |
-| 员工 (STAFF) | staff@example.com | password123 |
-| 客户 (CUSTOMER) | customer@example.com | password123 |
+| 员工 (STAFF) | staff1@example.com | password123 |
+| 客户 (CUSTOMER) | customer1@example.com | password123 |
 
 ## 工单状态流转
 

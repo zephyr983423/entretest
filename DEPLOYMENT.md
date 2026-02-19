@@ -52,8 +52,8 @@ pnpm dev
 | 角色 | 邮箱 | 密码 |
 |------|------|------|
 | 店主 | owner@example.com | password123 |
-| 员工 | staff@example.com | password123 |
-| 客户 | customer@example.com | password123 |
+| 员工 | staff1@example.com | password123 |
+| 客户 | customer1@example.com | password123 |
 
 ### 停止服务
 

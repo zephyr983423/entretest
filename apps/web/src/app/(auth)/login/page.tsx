@@ -73,8 +73,8 @@ export default function LoginPage() {
           <div className="mt-6 text-center text-sm text-gray-500">
             <p>测试账号：</p>
             <p>店主：owner@example.com / password123</p>
-            <p>员工：staff@example.com / password123</p>
-            <p>客户：customer@example.com / password123</p>
+            <p>员工：staff1@example.com / password123</p>
+            <p>客户：customer1@example.com / password123</p>
           </div>
         </CardContent>
       </Card>
